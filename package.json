@@ -1,0 +1,24 @@
+{
+  "name": "mr-gaming-c4s",
+  "version": "1.0.0",
+  "description": "Mr Gaming C4S - Gaming Profile Link Page with Vercel Web Analytics",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\"",
+    "lint": "echo \"No linting configured for static HTML\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gamingchulitha1212-netizen/mr-gaming-c4s.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gamingchulitha1212-netizen/mr-gaming-c4s/issues"
+  },
+  "homepage": "https://github.com/gamingchulitha1212-netizen/mr-gaming-c4s#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
