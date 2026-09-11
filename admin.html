@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Mr Gaming C4S</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{
+    --bg-void: #0D0402;
+    --bg-deep: #1A0A05;
+    --orange: #FF6B00;
+    --red: #FF3D1A;
+    --gold: #FFC700;
+    --text-dim: #C9A896;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    min-height:100vh;
+    background: radial-gradient(ellipse at 20% -10%, rgba(255,61,26,0.25), transparent 55%), var(--bg-void);
+    font-family:'Rajdhani',sans-serif;
+    color:#fff;
+    padding:32px 16px 60px;
+  }
+  .wrap{max-width:480px;margin:0 auto;}
+  h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:22px;
+    font-weight:800;
+    background:linear-gradient(90deg,var(--gold),var(--orange) 60%,var(--red));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:6px;
+  }
+  .sub{color:var(--text-dim);font-size:14px;margin-bottom:26px;}
+  .card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,107,0,0.25);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:16px;
+  }
+  label{display:block;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+  input[type=text], input[type=url], input[type=email], input[type=password]{
+    width:100%;
+    padding:11px 12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(0,0,0,0.35);
+    color:#fff;
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    margin-bottom:14px;
+  }
+  input:focus{outline:none;border-color:var(--orange);}
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .row input[type=checkbox]{width:18px;height:18px;}
+  .row label{margin-bottom:0;text-transform:none;letter-spacing:0;font-size:14px;color:#fff;}
+  .link-title{font-family:'Orbitron',sans-serif;font-size:14px;letter-spacing:1px;margin-bottom:14px;color:#fff;}
+  button{
+    font-family:'Orbitron',sans-serif;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:13px 18px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    width:100%;
+  }
+  .btn-primary{
+    background:linear-gradient(90deg,var(--orange),var(--red));
+    color:#fff;
+    margin-top:6px;
+  }
+  .divider{
+    display:flex;align-items:center;gap:10px;margin:16px 0;
+    color:var(--text-dim);font-size:12px;text-transform:uppercase;letter-spacing:1px;
+  }
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.15);}
+  .btn-google{
+    background:#fff;color:#1f1f1f;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14.5px;
+    text-transform:none;letter-spacing:0;width:100%;
+    padding:13px 18px;border-radius:10px;border:none;cursor:pointer;
+  }
+  .btn-google svg{width:18px;height:18px;}
+  .btn-facebook{
+    background:#1877F2;color:#fff;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14.5px;
+    text-transform:none;letter-spacing:0;width:100%;
+    padding:13px 18px;border-radius:10px;border:none;cursor:pointer;
+    margin-top:10px;
+  }
+  .btn-facebook svg{width:18px;height:18px;}
+  .btn-secondary{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.25);
+    color:var(--text-dim);
+    margin-top:10px;
+  }
+  #status{
+    margin-top:14px;
+    font-size:13px;
+    color:var(--gold);
+    min-height:18px;
+  }
+  #setupNotice{
+    background:rgba(255,61,26,0.1);
+    border:1px solid rgba(255,61,26,0.4);
+    border-radius:10px;
+    padding:16px;
+    font-size:14px;
+    line-height:1.5;
+    margin-bottom:20px;
+  }
+  #setupNotice code{
+    background:rgba(0,0,0,0.4);
+    padding:1px 6px;
+    border-radius:4px;
+  }
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Link Admin</h1>
+    <p class="sub">Sign in to edit the site's links — no code needed.</p>
+
+    <div id="setupNotice" class="hidden">
+      Firebase isn't set up yet, so this panel can't sign in or save.
+      Open <code>firebase-config.js</code> and fill in your Firebase project's
+      values first.
+    </div>
+
+    <div id="loginCard" class="card">
+      <label for="email">Email</label>
+      <input type="email" id="email" autocomplete="username">
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="current-password">
+      <button class="btn-primary" id="loginBtn">Sign In</button>
+
+      <div class="divider">or</div>
+
+      <button class="btn-google" id="googleBtn">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.1-5.1l-6.5-5.5c-2 1.4-4.6 2.2-7.6 2.2-5.2 0-9.6-3.3-11.3-8l-6.6 5.1C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.5 5.5C41.5 35.8 44 30.3 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        Continue with Google
+      </button>
+
+      <button class="btn-facebook" id="facebookBtn">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.16 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33V22c4.78-.78 8.44-4.94 8.44-9.94z"/></svg>
+        Continue with Facebook
+      </button>
+
+      <div id="status"></div>
+    </div>
+
+    <div id="editorCard" class="hidden">
+      <div id="linkForms"></div>
+      <button class="btn-primary" id="saveBtn">Save Changes</button>
+      <button class="btn-secondary" id="logoutBtn">Sign Out</button>
+      <div id="saveStatus"></div>
+    </div>
+  </div>
+
+  <script>
+    var LINK_META = [
+      { key: 'instagram', name: 'Instagram' },
+      { key: 'facebook', name: 'Facebook' },
+      { key: 'tiktok', name: 'TikTok' },
+      { key: 'youtube', name: 'YouTube' },
+      { key: 'discord', name: 'Discord' }
+    ];
+
+    var hasFirebase = (typeof firebaseConfig !== 'undefined') &&
+      firebaseConfig.databaseURL &&
+      firebaseConfig.databaseURL.indexOf('YOUR_PROJECT') === -1;
+
+    if (!hasFirebase) {
+      document.getElementById('setupNotice').classList.remove('hidden');
+      document.getElementById('loginBtn').disabled = true;
+    } else {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    var ADMIN_EMAIL = "chulitharv123@gmail.com";
+    var ADMIN_UID = "hSOy0TXxafQFsEGZZleIpgIVKVx1";
+
+    var loginBtn = document.getElementById('loginBtn');
+    var logoutBtn = document.getElementById('logoutBtn');
+    var saveBtn = document.getElementById('saveBtn');
+    var statusEl = document.getElementById('status');
+    var saveStatusEl = document.getElementById('saveStatus');
+    var loginCard = document.getElementById('loginCard');
+    var editorCard = document.getElementById('editorCard');
+    var linkForms = document.getElementById('linkForms');
+
+    if (hasFirebase) {
+      loginBtn.addEventListener('click', function () {
+        var email = document.getElementById('email').value.trim();
+        var pass = document.getElementById('password').value;
+        statusEl.textContent = 'Signing in...';
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+          .catch(function (err) {
+            statusEl.textContent = err.message;
+          });
+      });
+
+      logoutBtn.addEventListener('click', function () {
+        firebase.auth().signOut();
+      });
+
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          if (user.uid === ADMIN_UID || (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
+            loginCard.classList.add('hidden');
+            editorCard.classList.remove('hidden');
+            loadLinks();
+          } else {
+            // Signed in, but not the admin account — kick them back out.
+            statusEl.textContent = 'This account isn\'t authorized for admin access.';
+            firebase.auth().signOut();
+          }
+        } else {
+          loginCard.classList.remove('hidden');
+          editorCard.classList.add('hidden');
+        }
+      });
+
+      function loadLinks() {
+        linkForms.innerHTML = LINK_META.map(function (m) {
+          return (
+            '<div class="card">' +
+              '<div class="link-title">' + m.name + '</div>' +
+              '<label>Label (button text)</label>' +
+              '<input type="text" id="label-' + m.key + '" placeholder="' + m.name + '">' +
+              '<label>URL</label>' +
+              '<input type="url" id="url-' + m.key + '" placeholder="https://...">' +
+              '<div class="row">' +
+                '<input type="checkbox" id="enabled-' + m.key + '" checked>' +
+                '<label for="enabled-' + m.key + '">Show this button on the site</label>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+
+        firebase.database().ref('links').once('value').then(function (snap) {
+          var data = snap.val() || {};
+          LINK_META.forEach(function (m) {
+            var d = data[m.key] || {};
+            document.getElementById('label-' + m.key).value = d.label || '';
+            document.getElementById('url-' + m.key).value = d.url || '';
+            document.getElementById('enabled-' + m.key).checked = (d.enabled !== false);
+          });
+        });
+      }
+
+      saveBtn.addEventListener('click', function () {
+        var updates = {};
+        LINK_META.forEach(function (m) {
+          updates[m.key] = {
+            label: document.getElementById('label-' + m.key).value.trim(),
+            url: document.getElementById('url-' + m.key).value.trim(),
+            enabled: document.getElementById('enabled-' + m.key).checked
+          };
+        });
+        saveStatusEl.textContent = 'Saving...';
+        firebase.database().ref('links').set(updates)
+          .then(function () { saveStatusEl.textContent = 'Saved! The site will pick this up on next load.'; })
+          .catch(function (err) { saveStatusEl.textContent = 'Error: ' + err.message; });
+      });
+    }
+  </script>
+</body>
+</html>
